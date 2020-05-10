@@ -3,6 +3,7 @@ package application;
 import java.io.IOException;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -27,8 +28,12 @@ public class Main extends Application { // http://www.visualpharm.com/
 			scene = new Scene(root);
 			stage.setScene(scene);
 			stage.show();
+			stage.setOnCloseRequest(e -> {
+				primaryStage.hide();
+				Platform.exit();
+				System.exit(0);
+			});
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
