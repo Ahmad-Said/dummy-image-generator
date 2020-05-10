@@ -12,7 +12,7 @@ As simple as it say: it does generate multiple images at once with random color/
 
 Main View
 
-![Main](https://i.imgur.com/g4DADGi.png)
+![Main](https://i.imgur.com/gaJIP11.png)
 
 ### Release Notes
 
