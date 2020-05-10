@@ -20,7 +20,7 @@ public class Main extends Application { // http://www.visualpharm.com/
 		try {
 			primaryStage = stage;
 			stage.setTitle("Dummy Image Generator");
-			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/img/dummy-image-generator.png")));
+			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/img/icon.png")));
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PhotoGenerator.fxml"));
 			Parent root;
 			Scene scene;

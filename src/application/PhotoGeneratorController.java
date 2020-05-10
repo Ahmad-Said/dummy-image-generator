@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import application.fxGraphics.IntField;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.TextField;
@@ -80,20 +82,21 @@ public class PhotoGeneratorController implements Initializable {
 			});
 			allThreadMenuItems.getToggles().add(mn);
 		}
-		executors = Executors.newFixedThreadPool(2);
 		allThreadMenuItems.getToggles().get(1).setSelected(true);
+		executors = Executors.newFixedThreadPool(2);
+		executors.execute(() -> {
+			for (int r = 0; r <= 255; r += 10) {
+				for (int g = 0; g <= 255; g += 10) {
+					for (int b = 0; b <= 255; b += 10) {
+						painterColorCollection.add(new Color(r, g, b));
+					}
+				}
+			}
+		});
 	}
 
 	public PhotoGeneratorController() {
 		painterColorCollection = new ArrayList<Color>();
-		// take too long time
-//		for (int r = 0; r <= 255; r++) {
-//			for (int g = 0; g <= 255; g++) {
-//				for (int b = 0; b <= 255; b++) {
-//					painterColorCollection.add(new Color(r, g, b));
-//				}
-//			}
-//		}
 		// add your color here
 		painterColorCollection.add(Color.BLACK);
 		painterColorCollection.add(Color.BLUE);
@@ -113,13 +116,16 @@ public class PhotoGeneratorController implements Initializable {
 		targetDirectoryText.setText("\n" + dir.toString());
 	}
 
+	// TODO generating null pointer exception on youseef computer
 	private File getInitialDirectory() {
 		// initial directory
 		Preferences prefs = Preferences.userNodeForPackage(getClass());
 		String initialDir = prefs.get(LAST_DIRECTORY_PREF_KEY, null);
-		File initialFile = new File(initialDir);
-		if (!initialFile.exists()) {
+		File initialFile = null;
+		if (initialDir == null || !new File(initialDir).exists()) {
 			initialFile = new File(System.getProperty("user.home"));
+		} else {
+			initialFile = new File(initialDir);
 		}
 		return initialFile;
 	}
@@ -208,7 +214,6 @@ public class PhotoGeneratorController implements Initializable {
 //		graphics.setPaint(painterColorCollection.get(rand.nextInt(painterColorCollection.size())));
 //		// Fill background
 //		graphics.fillRect(0, 0, imgb1.getWidth(), imgb1.getHeight());
-
 		// random shapes
 		int shapeWidth = width / numberOfShapes;
 		int shapeHeight = height / numberOfShapes;
@@ -216,11 +221,7 @@ public class PhotoGeneratorController implements Initializable {
 			for (int j = 0; j < numberOfShapes; j++) {
 				int randomNum = rand.nextInt(painterColorCollection.size());
 				graphics.setPaint(painterColorCollection.get(randomNum));
-				if (randomNum % 2 == 0) {
-					graphics.fillRect(i * shapeWidth, j * shapeHeight, shapeWidth, shapeHeight);
-				} else {
-					graphics.fillOval(i * shapeWidth, j * shapeHeight, shapeWidth, shapeHeight);
-				}
+				graphics.fillOval(i * shapeWidth, j * shapeHeight, shapeWidth, shapeHeight);
 			}
 		}
 
@@ -235,6 +236,22 @@ public class PhotoGeneratorController implements Initializable {
 			throw new RuntimeException(e);
 		}
 		return outputFile;
+	}
+
+	@FXML
+	public void showAbout() {
+		DialogHelper.showAlert(Alert.AlertType.INFORMATION, "About", null,
+				"Dummy Image generator v1.0.2\n\n" + "Copyright © 2020 by Ahmad Said");
+	}
+
+	@FXML
+	public void checkForUpdate() {
+		try {
+			Desktop.getDesktop()
+					.browse(new URL("https://github.com/Ahmad-Said/dummy-image-generator/releases").toURI());
+		} catch (IOException | URISyntaxException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
